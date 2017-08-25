@@ -35,7 +35,7 @@ repositories {
 }
 
 dependencies {
-    compile("org.springframework.boot:spring-boot-starter:1.5.+"){
+    compile("org.springframework.boot:spring-boot-starter-web:1.5.+"){
         exclude module: "spring-boot-starter-logging"
     }
     compile("org.springframework.boot:spring-boot-starter-log4j2:1.5.+")
