@@ -1,2 +1,24 @@
 # Tomcat
 server.port: 80
+
+# QQ
+qq:
+  app_id: 101419871
+  app_key: your_app_key
+
+# AliPay
+alipay:
+  api: https://openapi.alipay.com/gateway.do
+  app_id: 2017082308339575
+  ali_pub_key: MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAkDmPO8oBnV3ISGfX4dhTBXmlPUvouCyL/4M37m6ibuRArHJAJO8O1P7b9NTVIWQSMjN6RNxKPnfcE0YhURVwx04JIxQKE30czK6/zhiG1V0oqhUIPPeJ/UPuY3i6g+imyXwD9I9UuohXxL6/bh44CeenjvzmGbuXJGfCZM6Fa0gxZI1EfRGsVwTd5ErNhD5Ib9BxbuQSkChfkGWHwyhVR/JxD8LKYBY0x6HxOLjt6lxjyeDuQ55kn8gugEftW6xZOMXJoD7h/2Sru6pq7S1I3sbgWwaLZ0c2DiVrDhwszb77Wk/O1nkHgQzXSGZKcFbHqMTH9kaJOoAnq0tUQ5C9vQIDAQAB
+  app_pub_key: your_app_public_key
+  app_pri_key: your_app_private_key
+
+# AliYun
+aliyun:
+    accountId: 1786089012649873
+    accessKeyId: qkjiPJf7YkkYhW39
+    accessKeySecret: ruk******qPT
+    OTS:
+        endpoint: http://rooster.cn-hangzhou.ots-internal.aliyuncs.com
+
