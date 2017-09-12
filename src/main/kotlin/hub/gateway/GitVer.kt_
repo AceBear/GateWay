@@ -1,0 +1,11 @@
+package hub.gateway
+
+class GitVer {
+    val branch = "$branch$"
+    val rev = "$rev$"
+    val hash = "$hash$"
+    val hash160 = "$hash160$"
+
+    fun version():String { return "$branch.$rev@$hash" }
+    fun sourceLink():String { return "https://github.com/HTTPS-HUB/GateWay/tree/$hash160" }
+}

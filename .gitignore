@@ -7,7 +7,7 @@ bin
 .settings
 
 application-*.yml
-GitVer.java
+GitVer.kt
 gradle.properties
 *.log
 *.out

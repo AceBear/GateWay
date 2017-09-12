@@ -14,10 +14,12 @@ buildscript {
     }
 
     dependencies {
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.1.+")
         classpath("org.springframework.boot:spring-boot-gradle-plugin:1.5.+")
     }
 }
 
+apply plugin: 'kotlin'
 apply plugin: 'org.springframework.boot'
 
 sourceCompatibility = 1.8
@@ -35,6 +37,7 @@ repositories {
 }
 
 dependencies {
+    compile("org.jetbrains.kotlin:kotlin-stdlib-jre8:1.1.+")
     compile("org.springframework.boot:spring-boot-starter:1.5.+"){
         exclude module: "spring-boot-starter-logging"
     }
@@ -52,14 +55,16 @@ task MarkGitVersion{
         def hash160 = (git + "rev-parse HEAD").execute().text.trim()
         println("\tMark Git Version: " + branch + "." + rev + "@" + hash)
 
-        def javaFile = new File(projectDir, "src/main/java/hub/gateway/GitVer.jav_").text
+        def pathGitVer = projectDir.toPath().resolve("src/main/kotlin/hub/gateway").toFile()
+
+        def javaFile = new File(pathGitVer, "GitVer.kt_").text
         javaFile = javaFile
                 .replace("\$branch\$", branch)
                 .replace("\$rev\$", rev)
                 .replace("\$hash\$", hash)
                 .replace("\$hash160\$", hash160)
 
-        def writer = new PrintWriter(new File(projectDir, "src/main/java/hub/gateway/GitVer.java"))
+        def writer = new PrintWriter(new File(pathGitVer, "GitVer.kt"))
         writer.print(javaFile)
         writer.close()
     }
@@ -86,6 +91,7 @@ test{
 
 bootRun{
     systemProperties System.getProperties()
+    addResources = true
 }
 
 defaultTasks "assemble"
