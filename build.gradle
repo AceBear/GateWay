@@ -38,22 +38,24 @@ repositories {
 
 dependencies {
     compile("org.jetbrains.kotlin:kotlin-stdlib-jre8:1.1.+")
-    compile("org.springframework.boot:spring-boot-starter:1.5.+"){
+    compile("org.springframework.boot:spring-boot-starter-web:1.5.+"){
         exclude module: "spring-boot-starter-logging"
     }
     compile("org.springframework.boot:spring-boot-starter-log4j2:1.5.+")
+    compile("com.alibaba:fastjson:1.2.+")
+    compile("com.aliyun.openservices:tablestore:4.3.+")
     testCompile("junit:junit:4.+")
     testCompile("org.springframework.boot:spring-boot-starter-test:1.5.+")
 }
 
 task MarkGitVersion{
     doLast{
-        def git = "git -C " + projectDir + " "
-        def branch = (git + "symbolic-ref --short HEAD").execute().text.trim()
-        def rev = (git + "rev-list --count HEAD").execute().text.trim()
-        def hash = (git + "rev-parse --short HEAD").execute().text.trim()
-        def hash160 = (git + "rev-parse HEAD").execute().text.trim()
-        println("\tMark Git Version: " + branch + "." + rev + "@" + hash)
+        def git = "git -C ${projectDir}"
+        def branch = ("${git} symbolic-ref --short HEAD").execute().text.trim()
+        def rev = ("${git} rev-list --count HEAD").execute().text.trim()
+        def hash = ("${git} rev-parse --short HEAD").execute().text.trim()
+        def hash160 = ("${git} rev-parse HEAD").execute().text.trim()
+        println("\tMark Git Version: ${branch}.${rev}@${hash}")
 
         def pathGitVer = projectDir.toPath().resolve("src/main/kotlin/hub/gateway").toFile()
 

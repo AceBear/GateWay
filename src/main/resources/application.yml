@@ -1,2 +1,16 @@
 # Tomcat
 server.port: 80
+
+# QQ
+qq:
+  appId: 101419871
+  appSecret: 2c66********************24bd
+  appCallback: http://api.incarcloud.com/3rd/qq
+
+# AliYun
+aliyun:
+  accountId: 1786089012649873
+  accessKeyId: qkjiPJf7YkkYhW39
+  accessKeySecret: ruk******qPT
+  OTS:
+    endpoint: http://gate-way.cn-hangzhou.ots-internal.aliyuncs.com
