@@ -53,6 +53,11 @@ class UserController {
         val user = Repos.userRepo.findUserByUID(uid)
         return user
     }
+
+    @RequestMapping(path=arrayOf("/portal/user/logout"), method=arrayOf(RequestMethod.POST))
+    fun logout(@RequestBody data: LoginToken){
+        Repos.sessRepo.deleteSession(data.token)
+    }
 }
 
 class LoginFrom3rd{

@@ -37,6 +37,11 @@ class SessionRepo : Repository("session", 3600*24) {
         return uidToken.substring(0, 32)
     }
 
+    fun deleteSession(uidToken: String){
+        val pk = PriKeyStr("SESS${uidToken}")
+        delete(pk)
+    }
+
     // 生成Token的算法
     private fun genToken():String{
         val once = _rand.nextInt()
