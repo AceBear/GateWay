@@ -1,7 +1,6 @@
 package hub.gateway.ots
 
 import com.alicloud.openservices.tablestore.model.*
-import hub.gateway.mgr.Gender
 import hub.gateway.mgr.User
 import hub.gateway.portal.QQUserInfo
 import java.lang.RuntimeException

@@ -1,7 +1,8 @@
 package hub.gateway.mgr
 
 class Org {
-    val Id = 405
-    val Name = "XCAR"
-    val OwnerUserId = 17
+    var Id = 0
+    lateinit var Name : String
+    lateinit var OwnerUserId : String
+    var ts = 0L
 }

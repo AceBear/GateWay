@@ -82,4 +82,5 @@ abstract class Repository(tableName:String, timeToLiveSeconds:Int = -1, maxVersi
 object Repos {
     val userRepo = UserRepo()
     val sessRepo = SessionRepo()
+    val orgRepo = OrgRepo()
 }
