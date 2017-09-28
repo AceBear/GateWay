@@ -1,4 +1,4 @@
-package hub.gateway.mgr
+package hub.gateway.agent
 
 class App {
     val Id = 9853

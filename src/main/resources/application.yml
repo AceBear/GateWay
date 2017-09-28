@@ -14,3 +14,8 @@ aliyun:
   accessKeySecret: ruk******qPT
   OTS:
     endpoint: http://gate-way.cn-hangzhou.ots-internal.aliyuncs.com
+
+# GateWay
+gateway:
+  # 数据存储引擎类型
+  repo: AliYunOTS

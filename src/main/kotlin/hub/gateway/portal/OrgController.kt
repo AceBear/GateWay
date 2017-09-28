@@ -1,7 +1,7 @@
 package hub.gateway.portal
 
-import hub.gateway.mgr.Org
-import hub.gateway.ots.Repos
+import hub.gateway.agent.*
+import hub.gateway.repo.Repos
 import org.slf4j.LoggerFactory
 import org.springframework.web.bind.annotation.*
 
@@ -15,34 +15,44 @@ class OrgController {
     @RequestMapping(path=arrayOf("/portal/org/all"), method=arrayOf(RequestMethod.POST))
     fun getAllOrgs(@RequestBody arg: ArgGetAllOrgs):List<Org>{
         // 从token找到用户
-        val uid = Repos.sessRepo.findSession(arg.token)
-        if(uid === null) throw RuntimeException("token is invalid")
+        val sessAgent = Repos.sessRepo.findSession(arg.token.substring(0, 32), arg.token.substring(32))
+        check(sessAgent != null){ "token is invalid" }
 
-        val listOrgs = Repos.orgRepo.getOrgs(uid)
+        val listOrgs = Repos.orgRepo.getOrgs(sessAgent!!.uid)
 
-        return listOrgs
+        return listOrgs.map({ o -> o.toOrg() })
+    }
+
+    @RequestMapping(path=arrayOf("/portal/org/single"), method=arrayOf(RequestMethod.POST))
+    fun getAllOrgs(@RequestBody arg: ArgSingleOrg):Org?{
+        // 从token找到用户
+        val sessAgent = Repos.sessRepo.findSession(arg.token.substring(0, 32), arg.token.substring(32))
+        check(sessAgent != null){ "token is invalid" }
+
+        val org = Repos.orgRepo.getOrg(sessAgent!!.uid, arg.oid)
+        return org?.toOrg()
     }
 
     @RequestMapping(path=arrayOf("/portal/org/create"), method=arrayOf(RequestMethod.POST))
     fun createOrg(@RequestBody arg: ArgCreateOrg):Org{
         // 从token找到用户
-        val uid = Repos.sessRepo.findSession(arg.token)
-        if(uid === null) throw RuntimeException("token is invalid")
+        val sessAgent = Repos.sessRepo.findSession(arg.token.substring(0, 32), arg.token.substring(32))
+        check(sessAgent != null){ "token is invalid" }
 
         // 创建
-        val orgNew = Repos.orgRepo.createOrg(uid, arg.name)
+        val orgNew = Repos.orgRepo.createOrg(sessAgent!!.uid, arg.name)
 
-        return orgNew
+        return orgNew.toOrg()
     }
 
     @RequestMapping(path=arrayOf("/portal/org/delete"), method=arrayOf(RequestMethod.POST))
-    fun deleteOrg(@RequestBody arg: ArgDeleteOrg){
+    fun deleteOrg(@RequestBody arg: ArgSingleOrg){
         // 从token找到用户
-        val uid = Repos.sessRepo.findSession(arg.token)
-        if(uid === null) throw RuntimeException("token is invalid")
+        val sessAgent = Repos.sessRepo.findSession(arg.token.substring(0, 32), arg.token.substring(32))
+        check(sessAgent != null){ "token is invalid" }
 
         // 删除
-        Repos.orgRepo.deleteOrg(uid, arg.oid)
+        Repos.orgRepo.deleteOrg(sessAgent!!.uid, arg.oid)
     }
 }
 
@@ -55,7 +65,7 @@ class ArgCreateOrg{
     lateinit var name:String
 }
 
-class ArgDeleteOrg{
+class ArgSingleOrg {
     lateinit var token:String
     var oid = 0
 }
