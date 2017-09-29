@@ -1,12 +1,11 @@
 package hub.gateway.mgr
 
 import com.alicloud.openservices.tablestore.model.Row
-import hub.gateway.x3rd.*
 
 enum class Gender{ Male, Female }
 
-class User :Agent{
-    val id: String
+class User(uid:String, src:Row) :Agent(){
+    val id: String = uid
     var nick: String
     var headUrl: String? = null
     var gender: Gender? = null
@@ -14,10 +13,7 @@ class User :Agent{
     var city: String? = null
     var province: String? = null
 
-    private var qqTicket: QQTicket? = null
-
-    constructor(uid:String, src:Row):super(){
-        id = uid
+    init{
         nick = src.getLatestColumn("nick").value.asString()
         headUrl = src.getLatestColumn("head40")?.value?.asString()
 

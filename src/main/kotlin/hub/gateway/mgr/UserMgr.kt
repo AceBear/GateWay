@@ -34,18 +34,13 @@ class UserMgr: Mgr() {
         }
 
         // 尝试从缓冲区中检索
-        var usr = _hotCacheUSER.get(uid)
+        var usr = _hotCacheUSER.get(uid){
+            k -> Repos.userRepo.findUserByUID(k)
+        }
 
         if(usr === null){
-            // 缓冲区中没有,从存储中加载
-            usr = Repos.userRepo.findUserByUID(uid)
-            if(usr !== null) {
-                _hotCacheUSER.put(uid, usr)
-            }
-            else {
-                // 存储中的QQRef无效,清理掉无效数据
-                Repos.userRepo.deleteQQRef(_qq.appId, openId)
-            }
+            // 存储中的QQRef无效,清理掉无效数据
+            Repos.userRepo.deleteQQRef(_qq.appId, openId)
         }
 
         return usr
@@ -67,8 +62,12 @@ class UserMgr: Mgr() {
         val sess = Repos.sessRepo.findSession(uid, token)
         if(sess === null) return null
 
-        val user = Repos.userRepo.findUserByUID(sess.uid)
-        return user
+        // 尝试从缓冲区中检索
+        val usr = _hotCacheUSER.get(sess.uid){
+            k -> Repos.userRepo.findUserByUID(k)
+        }
+
+        return usr
     }
 
     /**

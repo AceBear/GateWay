@@ -17,6 +17,21 @@ class HotCache<K, V>(val max:Int = 1024*4) {
     }
 
     /**
+     * 加载对象
+     * 先从缓冲区中加载对象
+     * 如果失败,从另外的源加载
+     * 如果从另外的源加载成功,把对象缓冲
+     */
+    fun get(key: K, fnSrc:(key:K)->V?):V?{
+        var v = this.get(key)
+        if(v == null){
+            v = fnSrc(key)
+            if(v != null) this.put(key, v)
+        }
+        return v
+    }
+
+    /**
      * 把对象存入缓冲区中
      * 如果缓冲区已满,会把最久没使用的对象移出
      */
@@ -37,6 +52,13 @@ class HotCache<K, V>(val max:Int = 1024*4) {
         }
 
         _cache.putIfAbsent(key, CacheRecord(value))
+    }
+
+    /**
+     * 清除一条记录
+     */
+    fun remove(key:K){
+        _cache.remove(key)
     }
 }
 

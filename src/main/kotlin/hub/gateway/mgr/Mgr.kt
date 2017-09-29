@@ -5,4 +5,5 @@ open class Mgr {
 
 object Mgrs{
     val userMgr = UserMgr()
+    val orgMgr = OrgMgr()
 }

@@ -10,7 +10,10 @@ class AppController {
     }
 }
 
-class ArgCreateApp{
+open class ArgAppBasic{
     lateinit var token:String
+}
+
+class ArgCreateApp : ArgAppBasic(){
     lateinit var name:String
 }

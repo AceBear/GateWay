@@ -1,7 +1,6 @@
 package hub.gateway.portal
 
 import hub.gateway.mgr.*
-import hub.gateway.repo.Repos
 import org.slf4j.LoggerFactory
 import org.springframework.web.bind.annotation.*
 
@@ -12,59 +11,61 @@ class OrgController {
     }
 
     @RequestMapping(path=arrayOf("/portal/org/all"), method=arrayOf(RequestMethod.POST))
-    fun getAllOrgs(@RequestBody arg: ArgGetAllOrgs):List<Org>{
+    fun getAllOrgs(@RequestBody arg: ArgOrgBasic):List<OrgInfo>{
         // 从token找到用户
-        val sessAgent = Repos.sessRepo.findSession(arg.token.substring(0, 32), arg.token.substring(32))
-        check(sessAgent != null){ "token is invalid" }
+        val sess = Session(arg.token)
+        val usr = Mgrs.userMgr.findUserBySession(sess.uid, sess.token)
+        check(usr != null){ "token is invalid" }
 
-        val listOrgs = Repos.orgRepo.getOrgs(sessAgent!!.uid)
+        val listOrgs = Mgrs.orgMgr.getOrgs(usr!!.id)
 
-        return listOrgs.map({ o -> o.toOrg() })
+        return listOrgs.map({ o -> OrgInfo(o) })
     }
 
     @RequestMapping(path=arrayOf("/portal/org/single"), method=arrayOf(RequestMethod.POST))
-    fun getAllOrgs(@RequestBody arg: ArgSingleOrg):Org?{
+    fun getAllOrgs(@RequestBody arg: ArgSingleOrg): OrgInfo?{
         // 从token找到用户
-        val sessAgent = Repos.sessRepo.findSession(arg.token.substring(0, 32), arg.token.substring(32))
-        check(sessAgent != null){ "token is invalid" }
+        val sess = Session(arg.token)
+        val usr = Mgrs.userMgr.findUserBySession(sess.uid, sess.token)
+        check(usr != null){ "token is invalid" }
 
-        val org = Repos.orgRepo.getOrg(sessAgent!!.uid, arg.oid)
-        return org?.toOrg()
+        val org = Mgrs.orgMgr.getOrg(usr!!.id, arg.oid)
+        return if(org == null) null else OrgInfo(org)
     }
 
     @RequestMapping(path=arrayOf("/portal/org/create"), method=arrayOf(RequestMethod.POST))
-    fun createOrg(@RequestBody arg: ArgCreateOrg):Org{
+    fun createOrg(@RequestBody arg: ArgCreateOrg): OrgInfo {
         // 从token找到用户
-        val sessAgent = Repos.sessRepo.findSession(arg.token.substring(0, 32), arg.token.substring(32))
-        check(sessAgent != null){ "token is invalid" }
+        val sess = Session(arg.token)
+        val usr = Mgrs.userMgr.findUserBySession(sess.uid, sess.token)
+        check(usr != null){ "token is invalid" }
 
         // 创建
-        val orgNew = Repos.orgRepo.createOrg(sessAgent!!.uid, arg.name)
+        val orgNew = Mgrs.orgMgr .createOrg(usr!!.id, arg.name)
 
-        return orgNew.toOrg()
+        return OrgInfo(orgNew)
     }
 
     @RequestMapping(path=arrayOf("/portal/org/delete"), method=arrayOf(RequestMethod.POST))
     fun deleteOrg(@RequestBody arg: ArgSingleOrg){
         // 从token找到用户
-        val sessAgent = Repos.sessRepo.findSession(arg.token.substring(0, 32), arg.token.substring(32))
-        check(sessAgent != null){ "token is invalid" }
+        val sess = Session(arg.token)
+        val usr = Mgrs.userMgr.findUserBySession(sess.uid, sess.token)
+        check(usr != null){ "token is invalid" }
 
         // 删除
-        Repos.orgRepo.deleteOrg(sessAgent!!.uid, arg.oid)
+        Mgrs.orgMgr.deleteOrg(usr!!.id, arg.oid)
     }
 }
 
-class ArgGetAllOrgs{
-    lateinit var token:String
+open class ArgOrgBasic{
+    lateinit var token: String
 }
 
-class ArgCreateOrg{
-    lateinit var token:String
+class ArgCreateOrg : ArgOrgBasic(){
     lateinit var name:String
 }
 
-class ArgSingleOrg {
-    lateinit var token:String
+class ArgSingleOrg : ArgOrgBasic() {
     var oid = 0
 }

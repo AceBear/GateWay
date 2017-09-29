@@ -15,7 +15,7 @@ import hub.gateway.repo.IOrgRepo
  *  ORG引用区      UREF4|UID32|UID32|OID2
  */
 class OrgRepoOTS : RepoOTS("org"), IOrgRepo {
-    override fun createOrg(uid: String, name: String): OrgAgent{
+    override fun createOrg(uid: String, name: String): Org {
         require(uid.length == 32){ "预期uid有32个字符" }
         require(name.isNotBlank()){"组织名称不允许空白"}
         require(name.length == name.trim().length){"组织名称不允许以空白字符开头或结尾"}
@@ -58,10 +58,10 @@ class OrgRepoOTS : RepoOTS("org"), IOrgRepo {
         return org!!
     }
 
-    override fun getOrgs(uid: String) : List<OrgAgent>{
+    override fun getOrgs(uid: String) : List<Org>{
         require(uid.length == 32){ "预期uid有32个字符" }
 
-        var listOrgs = ArrayList<OrgAgent>()
+        var listOrgs = ArrayList<Org>()
 
         var rangeQuery = RangeRowQueryCriteria(_tableName)
         var pkStart : PrimaryKey? = PriKeyStr("ORG#${uid}01")
@@ -75,7 +75,7 @@ class OrgRepoOTS : RepoOTS("org"), IOrgRepo {
 
             for(row in resp.rows){
                 var pkv = row.primaryKey.getPrimaryKeyColumn(_pk).value.asString()
-                var org = OrgAgent(pkv.substring(pkv.length-2).toInt(16))
+                var org = Org(pkv.substring(pkv.length-2).toInt(16))
 
                 val colName = row.getLatestColumn("name")
                 org.name = colName.value.asString()
@@ -92,7 +92,7 @@ class OrgRepoOTS : RepoOTS("org"), IOrgRepo {
         return listOrgs
     }
 
-    override fun getOrg(uid: String, oid: Int): OrgAgent?{
+    override fun getOrg(uid: String, oid: Int): Org?{
         require(uid.length == 32){ "预期uid有32个字符" }
         require(oid > 0x00 && oid < 0xff){ "预期oid在1~254之间" }
 
@@ -107,7 +107,7 @@ class OrgRepoOTS : RepoOTS("org"), IOrgRepo {
 
         if(row === null) return null
 
-        var org = OrgAgent(oid)
+        var org = Org(oid)
 
         val colName = row.getLatestColumn("name")
         org.name = colName.value.asString()
