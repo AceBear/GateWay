@@ -14,7 +14,7 @@ class SessionRepoOTS : RepoOTS("session", "k", 3600*24), ISessionRepo {
     // 随机生成器
     private val _rand:Random = Random()
 
-    override fun createSession(uid:String, provider:String, userAgent:String): SessionAgent{
+    override fun createSession(uid:String, provider:String, userAgent:String): Session {
         // 随机产生1个16字符的token
         val token = genToken()
 
@@ -26,10 +26,10 @@ class SessionRepoOTS : RepoOTS("session", "k", 3600*24), ISessionRepo {
 
         _ots.putRow(PutRowRequest(put))
 
-        return SessionAgent(uid, token)
+        return Session(uid, token)
     }
 
-    override fun findSession(uid:String, token:String): SessionAgent?{
+    override fun findSession(uid:String, token:String): Session?{
         require(uid.length == 32){ "预期uid有32个字符" }
         require(token.length == 16){ "预期token有16个字符" }
 
@@ -38,7 +38,7 @@ class SessionRepoOTS : RepoOTS("session", "k", 3600*24), ISessionRepo {
 
         if(row === null) return null
 
-        return SessionAgent(uid, token)
+        return Session(uid, token)
     }
 
     override fun deleteSession(uid:String, token:String){

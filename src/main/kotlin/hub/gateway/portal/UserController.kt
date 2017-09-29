@@ -14,16 +14,17 @@ class UserController {
      * 第三方登录
      */
     @RequestMapping(path=arrayOf("/portal/user/login"), method=arrayOf(RequestMethod.POST))
-    fun login(@RequestBody data: LoginFrom3rd, @RequestHeader headers: HttpHeaders): UserLogin {
+    fun login(@RequestBody data: LoginFrom3rd, @RequestHeader headers: HttpHeaders): UserInfoLogin {
         require(data.provider.equals("qq", true)){ "暂不支持QQ以外的登录方式" }
 
-        val userAgent = Mgrs.userMgr.findFromQQ(data.code)
+        val usr = Mgrs.userMgr.findFromQQ(data.code)
+        check(usr !== null){ "QQ登录失败" }
 
         // 如果存在,生成登录token,返回给客户端,同时返回的还有用户昵称头像token有效期
-        val headUA = headers.getFirst("user-mgr")
-        val sessAgent = Repos.sessRepo.createSession(userAgent.id, data.provider, headUA?:"NA")
+        val headUA = headers.getFirst("user-agent")?:"NA"
+        val sess = Mgrs.userMgr.createSession(usr!!.id, data.provider, headUA)
 
-        return UserLogin(userAgent, sessAgent.token)
+        return UserInfoLogin(usr, sess.token)
     }
 
     /**
@@ -31,12 +32,13 @@ class UserController {
      * 如果token被从服务器端清除,token会无效
      */
     @RequestMapping(path=arrayOf("/portal/user/token"), method=arrayOf(RequestMethod.GET))
-    fun findUserByToken(@RequestBody data: LoginToken): User?{
-        val sessAgent = Repos.sessRepo.findSession(data.token.substring(0, 32), data.token.substring(32))
-        if(sessAgent === null) return null
+    fun findUserByToken(@RequestBody data: LoginToken): UserInfo?{
+        val sess = Session(data.token)
+        val usr = Mgrs.userMgr.findUserBySession(sess.uid, sess.token)
 
-        val userAgent = Repos.userRepo.findUserByUID(sessAgent.uid)
-        return User(userAgent!!)
+        if(usr === null) return null
+
+        return UserInfo(usr)
     }
 
     /**
@@ -44,7 +46,8 @@ class UserController {
      */
     @RequestMapping(path=arrayOf("/portal/user/logout"), method=arrayOf(RequestMethod.DELETE))
     fun logout(@RequestBody data: LoginToken){
-        Repos.sessRepo.deleteSession(data.token.substring(0, 32), data.token.substring(32))
+        val sess = Session(data.token)
+        Mgrs.userMgr.deleteSession(sess.uid, sess.token)
     }
 }
 

@@ -1,7 +1,7 @@
 package hub.gateway.repo.aliyunots
 
 import com.alicloud.openservices.tablestore.model.*
-import hub.gateway.mgr.UserAgent
+import hub.gateway.mgr.User
 import hub.gateway.repo.IUserRepo
 import hub.gateway.x3rd.QQUserInfo
 import java.security.MessageDigest
@@ -29,6 +29,14 @@ class UserRepoOTS:RepoOTS("user", "k", -1, 1), IUserRepo {
         assert(uid.isNotEmpty())
 
         return uid
+    }
+
+    override fun deleteQQRef(qqAppId: String, openId: String) {
+        require(qqAppId.length == 9){ "预期QQ分配的QQAppID有9个字符" }
+        require(openId.length == 32){ "预期QQ分配的OpenID有32个字符" }
+
+        val pk = PriKeyStr("QQ##${qqAppId}#######${openId}")
+        delete(pk)
     }
 
     override fun createUserFromQQ(qqAppId: String, openId: String, info: QQUserInfo): String {
@@ -90,13 +98,13 @@ class UserRepoOTS:RepoOTS("user", "k", -1, 1), IUserRepo {
         return uid
     }
 
-    override fun findUserByUID(uid:String):UserAgent?{
+    override fun findUserByUID(uid:String): User?{
         val pk = PriKeyStr("USER${uid}")
         val row = query(pk)
 
         if(row === null) return null
 
-        return UserAgent(uid, row)
+        return User(uid, row)
     }
 
     // 生成UID的算法
