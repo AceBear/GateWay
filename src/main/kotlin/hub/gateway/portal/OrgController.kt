@@ -5,7 +5,6 @@ import hub.gateway.repo.Repos
 import org.slf4j.LoggerFactory
 import org.springframework.web.bind.annotation.*
 
-@CrossOrigin
 @RestController
 class OrgController {
     companion object {

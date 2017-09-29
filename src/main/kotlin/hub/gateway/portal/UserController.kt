@@ -2,11 +2,9 @@ package hub.gateway.portal
 
 
 import hub.gateway.mgr.*
-import hub.gateway.repo.Repos
 import org.springframework.http.HttpHeaders
 import org.springframework.web.bind.annotation.*
 
-@CrossOrigin
 @RestController
 class UserController {
 
@@ -31,7 +29,7 @@ class UserController {
      * 根据登录token查询用户
      * 如果token被从服务器端清除,token会无效
      */
-    @RequestMapping(path=arrayOf("/portal/user/token"), method=arrayOf(RequestMethod.GET))
+    @RequestMapping(path=arrayOf("/portal/user/token"), method=arrayOf(RequestMethod.POST))
     fun findUserByToken(@RequestBody data: LoginToken): UserInfo?{
         val sess = Session(data.token)
         val usr = Mgrs.userMgr.findUserBySession(sess.uid, sess.token)

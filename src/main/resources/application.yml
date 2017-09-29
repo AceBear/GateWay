@@ -17,5 +17,8 @@ aliyun:
 
 # GateWay
 gateway:
+  # 前端网站域名(CORS)
+  sites:
+    - http://my.incarcloud.com
   # 数据存储引擎类型
   repo: AliYunOTS
