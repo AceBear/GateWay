@@ -1,4 +1,4 @@
-package hub.gateway.agent
+package hub.gateway.mgr
 
 class OrgAgent(val id:Int): Agent() {
     lateinit var name:String

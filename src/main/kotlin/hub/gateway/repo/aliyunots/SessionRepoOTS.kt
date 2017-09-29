@@ -1,16 +1,16 @@
 package hub.gateway.repo.aliyunots
 
 import com.alicloud.openservices.tablestore.model.*
-import hub.gateway.agent.*
+import hub.gateway.mgr.*
 import hub.gateway.repo.ISessionRepo
 import java.security.MessageDigest
 import java.util.*
 
 /**
- *  前缀4字符的数据区,最多存在8小时
+ *  前缀4字符的数据区,最多存在24小时
  *  会话主存储区 SESS4|UID32|Token16
  */
-class SessionRepoOTS : RepoOTS("session", 3600*8), ISessionRepo {
+class SessionRepoOTS : RepoOTS("session", "k", 3600*24), ISessionRepo {
     // 随机生成器
     private val _rand:Random = Random()
 
@@ -22,7 +22,7 @@ class SessionRepoOTS : RepoOTS("session", 3600*8), ISessionRepo {
         var put = RowPutChange(_tableName, pk)
 
         put.addColumn("provider", ColumnValue.fromString(provider))
-        put.addColumn("user-agent", ColumnValue.fromString(userAgent))
+        put.addColumn("user-mgr", ColumnValue.fromString(userAgent))
 
         _ots.putRow(PutRowRequest(put))
 

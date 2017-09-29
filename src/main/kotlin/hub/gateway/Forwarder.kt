@@ -1,6 +1,6 @@
 package hub.gateway
 
-import hub.gateway.agent.App
+import hub.gateway.mgr.App
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.client.RestTemplate
 

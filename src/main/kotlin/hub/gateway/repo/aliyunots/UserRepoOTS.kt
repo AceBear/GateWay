@@ -1,7 +1,7 @@
 package hub.gateway.repo.aliyunots
 
 import com.alicloud.openservices.tablestore.model.*
-import hub.gateway.agent.UserAgent
+import hub.gateway.mgr.UserAgent
 import hub.gateway.repo.IUserRepo
 import hub.gateway.x3rd.QQUserInfo
 import java.security.MessageDigest
@@ -13,7 +13,7 @@ import java.util.*
  *  用户主存储区 USER4|UID32
  *  用户QQ OpenId存储区 QQ##|AppId16|OpenId32
  */
-class UserRepoOTS:RepoOTS("user", -1, 1), IUserRepo {
+class UserRepoOTS:RepoOTS("user", "k", -1, 1), IUserRepo {
     override fun findUidByQQOpenId(qqAppId: String, openId: String): String? {
         require(qqAppId.length == 9){ "预期QQ分配的QQAppID有9个字符" }
         require(openId.length == 32){ "预期QQ分配的OpenID有32个字符" }

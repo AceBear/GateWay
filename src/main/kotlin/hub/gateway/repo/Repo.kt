@@ -8,10 +8,10 @@ import org.springframework.stereotype.Component
 /**
  * 数据持久基类
   */
-abstract class Repo{
+abstract class Repo(arg:Any){
 
     init {
-        ensureInfrastructure()
+        ensureInfrastructure(arg)
     }
 
     /**
@@ -20,7 +20,7 @@ abstract class Repo{
      * 例如,对于数据库需要表,存储过程,视图等等
      * 对于阿里云表格存储或hadoop的hbase,需要数据存储表
      */
-    protected abstract fun ensureInfrastructure()
+    protected abstract fun ensureInfrastructure(arg:Any)
 }
 
 /**

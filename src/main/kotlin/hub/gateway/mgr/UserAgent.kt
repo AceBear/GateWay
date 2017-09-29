@@ -1,4 +1,4 @@
-package hub.gateway.agent
+package hub.gateway.mgr
 
 import com.alicloud.openservices.tablestore.model.Row
 import hub.gateway.x3rd.*
@@ -20,7 +20,11 @@ class UserAgent:Agent{
         id = uid
         nick = src.getLatestColumn("nick").value.asString()
         headUrl = src.getLatestColumn("head40")?.value?.asString()
-        gender = Gender.valueOf(src.getLatestColumn("gender").value.asString()) // 需要空判断??
+
+        val strGender = src.getLatestColumn("gender").value.asString()
+        if(strGender !== null && strGender.equals("女")) gender = Gender.Female
+        else gender = Gender.Male
+
         birthYear = src.getLatestColumn("year").value?.asLong()?.toInt()
         city = src.getLatestColumn("city")?.value?.asString()
         province = src.getLatestColumn("province")?.value?.asString()

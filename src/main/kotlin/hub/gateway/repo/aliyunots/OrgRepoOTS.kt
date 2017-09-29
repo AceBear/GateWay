@@ -3,7 +3,7 @@ package hub.gateway.repo.aliyunots
 import com.alicloud.openservices.tablestore.*
 import com.alicloud.openservices.tablestore.model.*
 import com.alicloud.openservices.tablestore.model.condition.*
-import hub.gateway.agent.*
+import hub.gateway.mgr.*
 import hub.gateway.repo.IOrgRepo
 
 /**

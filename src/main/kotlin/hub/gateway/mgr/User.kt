@@ -1,4 +1,4 @@
-package hub.gateway.agent
+package hub.gateway.mgr
 
 open class User(src:UserAgent) {
     val id = src.id

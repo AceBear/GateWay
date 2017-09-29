@@ -6,23 +6,24 @@ import hub.gateway.Application
 import hub.gateway.portal.AliYunConfig
 import hub.gateway.repo.Repo
 
-open class RepoOTS(tableName:String, timeToLiveSeconds:Int = -1, maxVersion: Int = 1):Repo() {
+open class RepoOTS(tableName:String, pk:String = "k", timeToLiveSeconds:Int = -1, maxVersion: Int = 1)
+    :Repo(AliOTSDesc(tableName, pk, timeToLiveSeconds, maxVersion)) {
     // OTS表名
     protected val _tableName = tableName
-    // OTS表Options
-    protected val _tableOpt = TableOptions(timeToLiveSeconds, maxVersion)
     // OTS主键名
-    protected val _pk = "k"
+    protected val _pk = pk
     // OTS客户端
     protected lateinit var _ots: SyncClientInterface
 
-    override fun ensureInfrastructure() {
+    override fun ensureInfrastructure(arg:Any) {
+        val desc = arg as AliOTSDesc
+
         val aliYunCfg = Application.getCtx().getBean(AliYunConfig::class.java)
         _ots = aliYunCfg.getOTSSyncClient()
 
         var bReady = false
         while(!bReady){
-            val reqCheck = DescribeTableRequest(_tableName)
+            val reqCheck = DescribeTableRequest(desc.tableName)
             try {
                 _ots.describeTable(reqCheck)
                 bReady = true
@@ -30,10 +31,10 @@ open class RepoOTS(tableName:String, timeToLiveSeconds:Int = -1, maxVersion: Int
             catch(ex: TableStoreException){
                 if(ex.errorCode == "OTSObjectNotExist") {
 
-                    val meta = TableMeta(_tableName)
-                    meta.addPrimaryKeyColumn(_pk, PrimaryKeyType.STRING)
+                    val meta = TableMeta(desc.tableName)
+                    meta.addPrimaryKeyColumn(desc.pk, PrimaryKeyType.STRING)
 
-                    val reqCreate = CreateTableRequest(meta, _tableOpt)
+                    val reqCreate = CreateTableRequest(meta, TableOptions(desc.timeToLiveSeconds, desc.maxVersion))
                     _ots.createTable(reqCreate)
 
                     // 表创建后,OTS需要几秒钟时间来准备资源
@@ -74,3 +75,5 @@ open class RepoOTS(tableName:String, timeToLiveSeconds:Int = -1, maxVersion: Int
         _ots.deleteRow(DeleteRowRequest(del))
     }
 }
+
+class AliOTSDesc(val tableName:String, val pk:String = "k", val timeToLiveSeconds:Int = -1, val maxVersion:Int = 1)

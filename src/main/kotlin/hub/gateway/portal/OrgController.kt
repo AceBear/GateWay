@@ -1,6 +1,6 @@
 package hub.gateway.portal
 
-import hub.gateway.agent.*
+import hub.gateway.mgr.*
 import hub.gateway.repo.Repos
 import org.slf4j.LoggerFactory
 import org.springframework.web.bind.annotation.*

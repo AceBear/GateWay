@@ -1,6 +1,6 @@
 package hub.gateway.repo
 
-import hub.gateway.agent.SessionAgent
+import hub.gateway.mgr.SessionAgent
 
 interface ISessionRepo {
 
@@ -8,7 +8,7 @@ interface ISessionRepo {
      * 创建session记录
      * @param uid 用户ID
      * @param provider 登录来源,如QQ,wechat
-     * @param userAgent 浏览器的客户端user-agent
+     * @param userAgent 浏览器的客户端user-mgr
      */
     fun createSession(uid:String, provider:String, userAgent:String): SessionAgent
 

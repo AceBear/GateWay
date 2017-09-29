@@ -1,6 +1,6 @@
 package hub.gateway.repo
 
-import hub.gateway.agent.UserAgent
+import hub.gateway.mgr.UserAgent
 import hub.gateway.x3rd.QQUserInfo
 
 interface IUserRepo {

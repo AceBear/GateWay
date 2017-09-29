@@ -1,6 +1,6 @@
 package hub.gateway.repo
 
-import hub.gateway.agent.*
+import hub.gateway.mgr.*
 
 interface IOrgRepo {
     /**

@@ -1,4 +1,4 @@
-package hub.gateway.agent
+package hub.gateway.mgr
 
 import hub.gateway.Application
 import hub.gateway.repo.Repos
