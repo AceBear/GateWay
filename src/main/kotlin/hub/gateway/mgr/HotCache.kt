@@ -33,22 +33,11 @@ class HotCache<K, V>(val max:Int = 1024*4) {
 
     /**
      * 把对象存入缓冲区中
-     * 如果缓冲区已满,会把最久没使用的对象移出
+     * 如果缓冲区已满,会把最久没使用的一批对象移出
      */
     fun put(key:K, value:V){
         if(_cache.size >= max){
-            var minTS = System.currentTimeMillis()
-            var minKey:K? = null
-            _cache.keys.forEach(){ k->
-                val c = _cache[k]!!
-                if(c.lastVisit < minTS){
-                    minTS = c.lastVisit
-                    minKey = k
-                }
-            }
-
-            if(key != minKey)
-                _cache.remove(minKey)
+            discard()
         }
 
         _cache.putIfAbsent(key, CacheRecord(value))
@@ -59,6 +48,15 @@ class HotCache<K, V>(val max:Int = 1024*4) {
      */
     fun remove(key:K){
         _cache.remove(key)
+    }
+
+    /**
+     * 淘汰
+     */
+    private fun discard(){
+        val rate = 0.20f
+        val sorted = _cache.entries.sortedBy { t -> t.value.lastVisit }
+        sorted.subList(0, (max * rate).toInt()).forEach({x -> _cache.remove(x.key)})
     }
 }
 

@@ -11,7 +11,7 @@ class OrgController {
     }
 
     @RequestMapping(path=arrayOf("/portal/org/all"), method=arrayOf(RequestMethod.POST))
-    fun getAllOrgs(@RequestBody arg: ArgOrgBasic):List<OrgInfo>{
+    fun getAllOrgs(@RequestBody arg: ArgBasic):List<OrgInfo>{
         // 从token找到用户
         val sess = Session(arg.token)
         val usr = Mgrs.userMgr.findUserBySession(sess.uid, sess.token)
@@ -58,14 +58,10 @@ class OrgController {
     }
 }
 
-open class ArgOrgBasic{
-    lateinit var token: String
-}
-
-class ArgCreateOrg : ArgOrgBasic(){
+class ArgCreateOrg : ArgBasic(){
     lateinit var name:String
 }
 
-class ArgSingleOrg : ArgOrgBasic() {
+class ArgSingleOrg : ArgBasic() {
     var oid = 0
 }
