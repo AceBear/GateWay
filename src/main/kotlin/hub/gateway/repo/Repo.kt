@@ -30,6 +30,7 @@ object Repos{
     val userRepo:IUserRepo
     val sessRepo:ISessionRepo
     val orgRepo:IOrgRepo
+    val appRepo:IAppRepo
 
     init {
         val config = Application.getCtx().getBean(RepoConfig::class.java)
@@ -37,6 +38,7 @@ object Repos{
             userRepo = UserRepoOTS()
             sessRepo = SessionRepoOTS()
             orgRepo = OrgRepoOTS()
+            appRepo = AppRepoOTS()
         }
         else{
             TODO("当前只实现了AliYunOTS作为存储引擎的Repos")

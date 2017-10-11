@@ -12,7 +12,7 @@ class Forwarder {
                   @PathVariable appId:String?, @PathVariable oid:Int) : String {
 
         // 转发往App.base
-        var app = App() // 以后从存贮中根据appId查询得到
+        var app = App("123456789") // 以后从存贮中根据appId查询得到
         var url = "${app.base}/$targetClass/$dataRealm/$func/org/$oid"
 
         var request = RestTemplate()
