@@ -1,8 +1,8 @@
 package hub.gateway.mgr
 
-class Org {
-    var Id = 0
-    lateinit var Name : String
-    lateinit var OwnerUserId : String
-    var ts = 0L
+class Org(val id:Int): Agent() {
+    lateinit var name:String
+    var ts:Long = 0L
+    lateinit var ownerUserId:String
 }
+

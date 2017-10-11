@@ -1,4 +1,4 @@
-package hub.gateway.portal
+package hub.gateway.x3rd
 
 import com.alibaba.fastjson.JSON
 import org.springframework.beans.factory.annotation.Value
@@ -58,7 +58,7 @@ class OAuth2ForQQ {
         return matcher.group(1)
     }
 
-    fun getUserInfo(token:String, openId:String):QQUserInfo{
+    fun getUserInfo(token:String, openId:String): QQUserInfo {
         val url = String.format(_urlUserInfo, token, appId, openId)
         var request = RestTemplate()
         val response = request.getForObject(url, String::class.java)
@@ -69,7 +69,7 @@ class OAuth2ForQQ {
     }
 }
 
-class QQUserInfo(){
+class QQUserInfo{
     lateinit var nickname:String
     lateinit var gender:String
     lateinit var province:String
@@ -77,4 +77,9 @@ class QQUserInfo(){
     lateinit var year:String
     lateinit var figureurl_qq_1:String
     lateinit var figureurl_qq_2:String
+}
+
+class QQTicket{
+    lateinit var appId:String
+    lateinit var openId:String
 }
