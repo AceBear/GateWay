@@ -36,6 +36,17 @@ class AppController {
         return Mgrs.appMgr.getApps(pair.usr.id, pair.org.id)
     }
 
+    @RequestMapping(path=arrayOf("/portal/org/{oid}/app/{appId}"), method=arrayOf(RequestMethod.POST))
+    fun getApp(@PathVariable oid: Int, @PathVariable appId:String, @RequestBody arg: ArgBasic):App{
+        val pair = findUsrAndOrg(arg.token, oid)
+        val app = Mgrs.appMgr.getApp(appId)
+
+        check(app != null){ "App不存在" }
+        check(pair.usr.id == app!!.uid && pair.org.id == app.oid){ "App不存在" }
+
+        return app
+    }
+
     private fun findUsrAndOrg(token:String, oid:Int):Usr_Org{
         // 从token找到用户
         val sess = Session(token)
