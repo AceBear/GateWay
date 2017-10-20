@@ -1,0 +1,3 @@
+[submodule "LPU"]
+	path = LPU
+	url = https://github.com/LoPoU/LPU.git
