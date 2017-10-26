@@ -1,5 +1,7 @@
 package hub.gateway.realm
 
-class Func(url:String) {
-    val url:String = url
+class Func() {
+    lateinit var url:String
+    lateinit var chs:String
+    lateinit var httpMethod:String
 }

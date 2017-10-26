@@ -29,6 +29,22 @@ class AppController {
         Mgrs.appMgr.deleteApp(pair.usr.id, pair.org.id, arg.appId)
     }
 
+    @RequestMapping(path=arrayOf("/portal/org/{oid}/app/mod"), method=arrayOf(RequestMethod.POST))
+    fun modifyApp(@PathVariable oid: Int, @RequestBody arg: ArgModApp) {
+        val pair = findUsrAndOrg(arg.token, oid)
+        val app = Mgrs.appMgr.getApp(arg.app.appId)
+
+        check(app != null && app.uid == pair.usr.id && app.oid == pair.org.id){ "App不存在" }
+
+        // 如果实质上没有修改内容,什么也不做
+        if(app!!.name == arg.app.name && app.base == arg.app.baseUrl) return
+
+        // 修改内容
+        app.name = arg.app.name
+        app.base = arg.app.baseUrl
+        Mgrs.appMgr.modifyApp(app)
+    }
+
     @RequestMapping(path=arrayOf("/portal/org/{oid}/app"), method=arrayOf(RequestMethod.POST))
     fun getAllApps(@PathVariable oid: Int, @RequestBody arg: ArgBasic):List<AppNameOnly>{
         val pair = findUsrAndOrg(arg.token, oid)
@@ -68,6 +84,15 @@ class ArgCreateApp : ArgBasic(){
 
 class ArgDelApp: ArgBasic(){
     lateinit var appId: String
+}
+
+class ArgModApp: ArgBasic(){
+    class ModField{
+        lateinit var appId: String
+        lateinit var name: String
+        lateinit var baseUrl: String
+    }
+    lateinit var app: ModField
 }
 
 data class Usr_Org(val usr:User, val org:Org)

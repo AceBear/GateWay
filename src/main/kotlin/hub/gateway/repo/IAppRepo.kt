@@ -22,4 +22,9 @@ interface IAppRepo {
      * 删除app
      */
     fun deleteApp(uid:String, oid:Int, appId: String)
+
+    /**
+     * 修改app
+     */
+    fun modifyApp(app:App)
 }

@@ -38,6 +38,14 @@ class AppMgr:Mgr() {
     }
 
     /**
+     * 修改App
+     */
+    fun modifyApp(app:App){
+        _hotCacheApp.remove(app.id)
+        Repos.appRepo.modifyApp(app)
+    }
+
+    /**
      * 查询单个App
      */
     fun getApp(appId:String):App?{

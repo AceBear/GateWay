@@ -6,6 +6,10 @@ import hub.gateway.mgr.AppNameOnly
 import hub.gateway.repo.IAppRepo
 import java.security.MessageDigest
 import java.util.*
+import com.alicloud.openservices.tablestore.model.ColumnValue
+import com.alicloud.openservices.tablestore.model.condition.SingleColumnValueCondition
+
+
 
 /**
  *  前缀4字符的数据区
@@ -128,6 +132,27 @@ class AppRepoOTS : RepoOTS("app"), IAppRepo {
         puts.addRowChange(RowDeleteChange(_tableName, pk))
 
         _ots.batchWriteRow(puts)
+    }
+
+    override fun modifyApp(app: App) {
+        require(app.id.length == 32){ "预期appId有32个字符" }
+
+        val pk = PriKeyStr("APP#${app.id}")
+        val put = RowPutChange(_tableName, pk)
+        put.addColumn("name", ColumnValue.fromString(app.name))
+        put.addColumn("base", ColumnValue.fromString(app.base))
+        put.addColumn("uid", ColumnValue.fromString(app.uid))
+        put.addColumn("oid", ColumnValue.fromLong(app.oid.toLong()))
+
+        // 不允许修改uid & oid
+        val condition = Condition(RowExistenceExpectation.EXPECT_EXIST)
+        condition.columnCondition = SingleColumnValueCondition("uid",
+                SingleColumnValueCondition.CompareOperator.EQUAL, ColumnValue.fromString(app.uid))
+        condition.columnCondition = SingleColumnValueCondition("oid",
+                SingleColumnValueCondition.CompareOperator.EQUAL, ColumnValue.fromLong(app.oid.toLong()))
+        put.condition = condition
+
+        _ots.putRow(PutRowRequest(put))
     }
 
     // 生成AID的算法
