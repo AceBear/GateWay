@@ -137,6 +137,17 @@ class AppRepoOTS : RepoOTS("app"), IAppRepo {
     override fun modifyApp(app: App) {
         require(app.id.length == 32){ "预期appId有32个字符" }
 
+        require(app.name.isNotBlank()){ "App名称不能是空白" }
+        require(app.base.isNotBlank()){ "App基地址不能是空白" }
+
+        // 重名验证,限制相同org下的app不可以重名
+        val listApps = getApps(app.uid, app.oid)
+        for(apx in listApps){
+            if(apx.id == app.id) continue
+            if(apx.name.equals(app.name, true))
+                throw IllegalArgumentException("App${app.name}已经存在")
+        }
+
         val pk = PriKeyStr("APP#${app.id}")
         val put = RowPutChange(_tableName, pk)
         put.addColumn("name", ColumnValue.fromString(app.name))
