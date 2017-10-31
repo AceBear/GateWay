@@ -1,5 +1,7 @@
 package hub.gateway.realm
 
+import hub.gateway.realm.define.*
+
 /**
  * 数据领域
  * 数据领域针对一项TargetClass
@@ -22,6 +24,13 @@ abstract class DataRealm {
      * 功能
      */
     lateinit var funcs: List<Func>
+
+    companion object {
+        fun getAllDataRealms():List<DataRealm>{
+            // 这里添加所有定义
+            return arrayListOf(HelloWorld_Slim_100())
+        }
+    }
 }
 
 /**

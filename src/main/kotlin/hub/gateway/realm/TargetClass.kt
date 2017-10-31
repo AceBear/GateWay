@@ -3,9 +3,9 @@ package hub.gateway.realm
 import com.alibaba.fastjson.*
 import org.slf4j.LoggerFactory
 
-open class TargetClass(val key:String, val chs:String)
+open class TargetClass(val key:String, val dm: List<String>?, val chs:String)
 
-class TargetClassWithChildren(tc: TargetClass, val children:List<TargetClass>) :TargetClass(tc.key, tc.chs)
+class TargetClassWithChildren(tc: TargetClass, val children:List<TargetClass>) :TargetClass(tc.key, tc.dm, tc.chs)
 
 /**
  * 对现实世界中的事务的一个分类
@@ -26,6 +26,7 @@ object targetClassHolder{
         |   },
         |   "SandBox":{
         |       "chs": "沙箱",
+        |       "dm": [ "HelloWorld" ]
         |   },
         |   "Vehicle": {
         |       "chs": "汽车",
@@ -64,7 +65,12 @@ object targetClassHolder{
     fun getNode(key:String):TargetClass?{
         val clsX = jsonObj[key] as JSONObject?
         return clsX?.let{
-            TargetClass(key, clsX["chs"] as String)
+            val dmT = clsX["dm"] as JSONArray?
+            val dm = dmT?.map({
+                it as String
+            }) ?: ArrayList<String>()
+
+            TargetClass(key, dm, clsX["chs"] as String)
         }
     }
 
@@ -75,11 +81,20 @@ object targetClassHolder{
         val clsP = jsonObj[key] as JSONObject?
 
         return clsP?.let{
+            val dmT = clsP["dm"] as JSONArray?
+            val dm = dmT?.map({
+                it as String
+            }) ?: ArrayList<String>()
+
             val children = clsP["children"] as JSONArray?
             children?.map({
-                logger.info("$it")
                 val cls = jsonObj[it] as JSONObject
-                TargetClass(it as String, cls["chs"] as String)
+                val dmTC = cls["dm"] as JSONArray?
+                val dmC = dmTC?.map({
+                    it as String
+                }) ?: ArrayList<String>()
+
+                TargetClass(it as String, dmC, cls["chs"] as String)
             }) ?: ArrayList<TargetClass>()
         } ?: ArrayList<TargetClass>()
     }

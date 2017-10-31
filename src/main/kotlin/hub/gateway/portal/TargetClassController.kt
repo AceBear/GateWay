@@ -29,4 +29,12 @@ class TargetClassController {
         val list = targetClassHolder.getChildren(key)
         return clsNode?.let{TargetClassWithChildren(clsNode, list)}
     }
+
+    /**
+     * 数据领域
+     */
+    @RequestMapping(path=arrayOf("/portal/realm/{key}"))
+    fun getDataRealms(@PathVariable key: String):List<DataRealm>{
+        return DataRealm.getAllDataRealms().filter { it.id == key }
+    }
 }
