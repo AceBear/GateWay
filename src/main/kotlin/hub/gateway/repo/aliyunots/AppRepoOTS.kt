@@ -146,9 +146,7 @@ class AppRepoOTS : RepoOTS("app"), IAppRepo {
                         app.abi.put(target, HashMap<String, DataRealm>())
                     }
 
-                    s_logger.info("$target $realm $level $version")
                     val rlm = DataRealm.getAllDataRealms().first{
-                        s_logger.info("${it.id} ${it.level} ${it.ver}")
                         it.id == realm && it.level == level
                         && "${it.ver}" == version
                     }
@@ -176,6 +174,27 @@ class AppRepoOTS : RepoOTS("app"), IAppRepo {
         val puts = BatchWriteRowRequest()
         puts.addRowChange(RowDeleteChange(_tableName, pkRef))
         puts.addRowChange(RowDeleteChange(_tableName, pk))
+
+        // 删除功能相关的
+        val qry = RangeRowQueryCriteria(_tableName)
+        qry.inclusiveStartPrimaryKey = PriKeyStr("APP#${appId}!")
+        qry.exclusiveEndPrimaryKey = PriKeyStr("APP#${appId}z")
+        qry.maxVersions = 1
+        // 只需要取出key,不需要任何列的值
+        qry.startColumn = "a"
+        qry.endColumn = "b"
+
+        while(true){
+            val resp = _ots.getRange(GetRangeRequest(qry))
+            for(row in resp.rows){
+                puts.addRowChange(RowDeleteChange(_tableName, row.primaryKey))
+            }
+
+            if(resp.nextStartPrimaryKey != null)
+                qry.inclusiveStartPrimaryKey = resp.nextStartPrimaryKey
+            else
+                break
+        }
 
         _ots.batchWriteRow(puts)
     }
