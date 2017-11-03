@@ -81,11 +81,6 @@ object targetClassHolder{
         val clsP = jsonObj[key] as JSONObject?
 
         return clsP?.let{
-            val dmT = clsP["dm"] as JSONArray?
-            val dm = dmT?.map({
-                it as String
-            }) ?: ArrayList<String>()
-
             val children = clsP["children"] as JSONArray?
             children?.map({
                 val cls = jsonObj[it] as JSONObject

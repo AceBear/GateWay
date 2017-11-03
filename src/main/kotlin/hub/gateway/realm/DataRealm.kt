@@ -37,4 +37,8 @@ abstract class DataRealm {
  * 版本号
  * major.minor.fix
  */
-class DataRealmVersion(val major:Int = 1, val minor:Int = 0, val fix:Int = 0)
+class DataRealmVersion(val major:Int = 1, val minor:Int = 0, val fix:Int = 0){
+    override fun toString(): String {
+        return "$major.$minor.$fix"
+    }
+}

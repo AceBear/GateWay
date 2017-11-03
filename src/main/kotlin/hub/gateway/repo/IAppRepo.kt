@@ -1,6 +1,7 @@
 package hub.gateway.repo
 
 import hub.gateway.mgr.*
+import hub.gateway.realm.DataRealmVersion
 
 interface IAppRepo {
     /**
@@ -24,7 +25,19 @@ interface IAppRepo {
     fun deleteApp(uid:String, oid:Int, appId: String)
 
     /**
-     * 修改app
+     * 修改app基本信息
      */
     fun modifyApp(app:App)
+
+    /**
+     * 增加功能
+     */
+    fun addAbility(appId: String, abi: AppAbility): App
+}
+
+class AppAbility{
+    lateinit var target: String
+    lateinit var realm: String
+    var level: Int = 0
+    lateinit var version: DataRealmVersion
 }

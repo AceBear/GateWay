@@ -1,6 +1,7 @@
 package hub.gateway.portal
 
 import hub.gateway.mgr.*
+import hub.gateway.repo.AppAbility
 import org.slf4j.LoggerFactory
 import org.springframework.web.bind.annotation.*
 
@@ -63,6 +64,19 @@ class AppController {
         return app
     }
 
+    @RequestMapping(path=arrayOf("/portal/org/{oid}/app/{appId}/ability"), method=arrayOf(RequestMethod.POST))
+    fun addAbility(@PathVariable oid: Int, @PathVariable appId:String, @RequestBody arg: ArgAbility):App{
+        val pair = findUsrAndOrg(arg.token, oid)
+        val app = Mgrs.appMgr.getApp(appId)
+
+        check(app != null){ "App不存在" }
+        check(pair.usr.id == app!!.uid && pair.org.id == app.oid){ "App不存在" }
+
+        Mgrs.appMgr.addAbility(app.id, arg.ability)
+
+        return app
+    }
+
     private fun findUsrAndOrg(token:String, oid:Int):Usr_Org{
         // 从token找到用户
         val sess = Session(token)
@@ -93,6 +107,10 @@ class ArgModApp: ArgBasic(){
         lateinit var baseUrl: String
     }
     lateinit var app: ModField
+}
+
+class ArgAbility: ArgBasic(){
+    lateinit var ability: AppAbility
 }
 
 data class Usr_Org(val usr:User, val org:Org)

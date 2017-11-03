@@ -8,15 +8,22 @@ import java.security.MessageDigest
 import java.util.*
 import com.alicloud.openservices.tablestore.model.ColumnValue
 import com.alicloud.openservices.tablestore.model.condition.SingleColumnValueCondition
-
+import hub.gateway.realm.DataRealm
+import hub.gateway.repo.AppAbility
+import org.slf4j.LoggerFactory
 
 
 /**
  *  前缀4字符的数据区
  *  APP主存储区     APP#4|APPID32
+ *  APP功能区       APP#4|APPID32|BLT#4|TARGET16|REALM16
  *  APP引用区       AREF4|UID32|OID2|APPID32
  */
 class AppRepoOTS : RepoOTS("app"), IAppRepo {
+    companion object {
+        val s_logger = LoggerFactory.getLogger(AppRepoOTS::class.java)
+    }
+
     val _rand = Random()
 
     override fun createApp(app: App): App {
@@ -99,22 +106,61 @@ class AppRepoOTS : RepoOTS("app"), IAppRepo {
     override fun getApp(appId: String): App? {
         require(appId.length == 32){ "预期appId有32个字符" }
 
-        val pkv = "APP#$appId"
-        val pk = PriKeyStr(pkv)
+        val qry = RangeRowQueryCriteria(_tableName)
+        qry.inclusiveStartPrimaryKey = PriKeyStr("APP#$appId")
+        qry.exclusiveEndPrimaryKey = PriKeyStr("APP#${appId}z")
+        qry.maxVersions = 1
 
-        var get = SingleRowQueryCriteria(_tableName, pk)
-        get.maxVersions = 1
+        var app:App? = null
+        while(true){
+            val resp = _ots.getRange(GetRangeRequest(qry))
 
-        val resp = _ots.getRow(GetRowRequest(get))
-        val row = resp.row
+            // 以下2种数据都会取出来
+            // APP主存储区    APP#4|APPID32
+            // APP功能区      APP#4|APPID32|BLT#4|TARGET16|REALM16
+            for(row in resp.rows){
+                val key = row.primaryKey.getPrimaryKeyColumn(_pk).value.asString()
+                if(key.length == 4+32){
+                    app = App(appId)
+                    app.name = row.getLatestColumn("name").value.asString()
+                    app.base = row.getLatestColumn("base").value.asString()
+                    app.uid = row.getLatestColumn("uid").value.asString()
+                    app.oid = row.getLatestColumn("oid").value.asLong().toInt()
+                }
+                else{
+                    // 按我们指定的查询方式,一定是先返回app
+                    // 如果app是空,表明APP主存储区数据丢失
+                    if(app == null){
+                        s_logger.warn("App信息丢失:$appId")
+                        break
+                    }
 
-        if(row === null) return null
+                    // fetch features
+                    val target = key.substring(4+32+4, 4+32+4+16).trim('#')
+                    val realm = key.substring(4+32+4+16).trim('#')
 
-        var app = App(appId)
-        app.name = row.getLatestColumn("name").value.asString()
-        app.base = row.getLatestColumn("base").value.asString()
-        app.uid = row.getLatestColumn("uid").value.asString()
-        app.oid = row.getLatestColumn("oid").value.asLong().toInt()
+                    val level = row.getLatestColumn("level").value.asLong().toInt()
+                    val version = row.getLatestColumn("version").value.asString()
+
+                    if(!app.abi.containsKey(target)){
+                        app.abi.put(target, HashMap<String, DataRealm>())
+                    }
+
+                    s_logger.info("$target $realm $level $version")
+                    val rlm = DataRealm.getAllDataRealms().first{
+                        s_logger.info("${it.id} ${it.level} ${it.ver}")
+                        it.id == realm && it.level == level
+                        && "${it.ver}" == version
+                    }
+                    app.abi[target]!!.put(realm, rlm)
+                }
+            }
+
+            if(resp.nextStartPrimaryKey != null)
+                qry.inclusiveStartPrimaryKey = resp.nextStartPrimaryKey
+            else
+                break
+        }
 
         return app
     }
@@ -166,6 +212,27 @@ class AppRepoOTS : RepoOTS("app"), IAppRepo {
         _ots.putRow(PutRowRequest(put))
     }
 
+    override fun addAbility(appId: String, abi: AppAbility): App {
+        require(appId.length == 32){ "预期appId有32个字符" }
+
+        require(abi.target.isNotBlank()){ "target不能是空白" }
+        require(abi.target.length <= 16){ "预期target至多有16个字符" }
+
+        require(abi.realm.isNotBlank()){ "realm不能是空白" }
+        require(abi.realm.length <= 16){ "预期realm至多有16个字符" }
+
+
+        val pkv = "APP#${appId}BLT#${pad(abi.target, 16)}${pad(abi.realm, 16)}"
+        val pk = PriKeyStr(pkv)
+        val put = RowPutChange(_tableName, pk)
+        put.addColumn("level", ColumnValue.fromLong(abi.level.toLong()))
+        put.addColumn("version", ColumnValue.fromString("${abi.version}"))
+
+        _ots.putRow(PutRowRequest(put))
+
+        return getApp(appId)!!
+    }
+
     // 生成AID的算法
     private fun genAppId(uid: String, oid: Int):String{
         val md5 = MessageDigest.getInstance("MD5")
@@ -178,5 +245,19 @@ class AppRepoOTS : RepoOTS("app"), IAppRepo {
         val aid = sbHex.toString()
         check(aid.length == 32){ "期望appId由32个字符组成" }
         return aid
+    }
+
+    // 补足长度
+    private fun pad(value: String, len: Int, c: Char = '#'): String{
+        require(len > 0){ "len必须大于0" }
+        require(value.length <= len){ "value超长" }
+
+        val sbPad = StringBuilder(len)
+        sbPad.append(value)
+        for(i in 0..len-value.length){
+            sbPad.append(c)
+        }
+
+        return sbPad.toString()
     }
 }

@@ -1,5 +1,9 @@
 package hub.gateway.mgr
 
+import hub.gateway.realm.DataRealm
+import hub.gateway.realm.DataRealmVersion
+import hub.gateway.realm.targetClassHolder
+import hub.gateway.repo.AppAbility
 import hub.gateway.repo.Repos
 
 class AppMgr:Mgr() {
@@ -54,5 +58,45 @@ class AppMgr:Mgr() {
         }
 
         return app
+    }
+
+    /**
+     * 向App增加1项功能
+     */
+    fun addAbility(appId:String, abi: AppAbility):App{
+        val app = _hotCacheApp.get(appId){
+            _ -> Repos.appRepo.getApp(appId)
+        }
+
+        check(app != null){ "App $appId does not exist" }
+
+        // 确认abi里指定的参数都是可行的
+        // 1. target存在
+        // 2. realm是target可接受的范围
+        // 3. 指定的level和version是存在的
+
+        val tc = targetClassHolder.getNode(abi.target)
+        check(tc != null){ "${abi.target} do not exist!" }
+
+        check(tc!!.dm != null && tc.dm!!.contains(abi.realm)){ "${abi.target} is not compatible with ${abi.realm}" }
+
+        val realm = DataRealm.getAllDataRealms().firstOrNull {
+            it.id == abi.realm && it.level == abi.level
+            && it.ver.major == abi.version.major
+            && it.ver.minor == abi.version.minor
+            && it.ver.fix == abi.version.fix
+
+        }
+        check(realm != null){
+            "${abi.realm} - ${abi.level} - ${abi.version.major}.${abi.version.minor}.${abi.version.fix} does not exist"
+        }
+
+        val appNew = Repos.appRepo.addAbility(app!!.id, abi)
+
+        // update cache
+        _hotCacheApp.remove(appNew.id)
+        _hotCacheApp.put(appNew.id, appNew)
+
+        return appNew
     }
 }
