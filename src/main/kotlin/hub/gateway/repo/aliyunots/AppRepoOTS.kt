@@ -141,6 +141,7 @@ class AppRepoOTS : RepoOTS("app"), IAppRepo {
 
                     val level = row.getLatestColumn("level").value.asLong().toInt()
                     val version = row.getLatestColumn("version").value.asString()
+                    val prefix = row.getLatestColumn("prefix").value.asString()
 
                     if(!app.abi.containsKey(target)){
                         app.abi.put(target, HashMap<String, DataRealm>())
@@ -150,6 +151,9 @@ class AppRepoOTS : RepoOTS("app"), IAppRepo {
                         it.id == realm && it.level == level
                         && "${it.ver}" == version
                     }
+
+                    rlm.prefix = prefix
+
                     app.abi[target]!!.put(realm, rlm)
                 }
             }
@@ -246,6 +250,7 @@ class AppRepoOTS : RepoOTS("app"), IAppRepo {
         val put = RowPutChange(_tableName, pk)
         put.addColumn("level", ColumnValue.fromLong(abi.level.toLong()))
         put.addColumn("version", ColumnValue.fromString("${abi.version}"))
+        put.addColumn("prefix", ColumnValue.fromString("${abi.prefix}"))
 
         _ots.putRow(PutRowRequest(put))
 

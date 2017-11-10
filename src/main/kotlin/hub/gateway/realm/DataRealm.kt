@@ -31,6 +31,11 @@ abstract class DataRealm {
             return arrayListOf(HelloWorld_Slim_100())
         }
     }
+
+    /**
+     * 应用实现时自定义的一个前缀
+     */
+    var prefix: String? = null
 }
 
 /**

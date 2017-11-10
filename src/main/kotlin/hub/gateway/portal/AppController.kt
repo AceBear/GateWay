@@ -1,6 +1,7 @@
 package hub.gateway.portal
 
 import hub.gateway.mgr.*
+import hub.gateway.realm.DataRealm
 import hub.gateway.repo.AppAbility
 import org.slf4j.LoggerFactory
 import org.springframework.web.bind.annotation.*

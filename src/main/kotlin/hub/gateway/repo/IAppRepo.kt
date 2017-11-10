@@ -40,4 +40,5 @@ class AppAbility{
     lateinit var realm: String
     var level: Int = 0
     lateinit var version: DataRealmVersion
+    lateinit var prefix: String
 }
