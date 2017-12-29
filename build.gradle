@@ -47,8 +47,6 @@ dependencies {
     compile("com.alibaba:fastjson:1.2.+")
     compile("com.aliyun.openservices:tablestore:4.3.+")
 
-    compile project("LPU")
-
     testCompile("org.junit.jupiter:junit-jupiter-api:5.0.+")
     testRuntime("org.junit.jupiter:junit-jupiter-engine:5.0.+")
 }
